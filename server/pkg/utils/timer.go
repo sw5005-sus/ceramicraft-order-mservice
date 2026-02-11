@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/log"
@@ -49,7 +50,12 @@ func (t *MyTimerImpl) Start(ctx context.Context, task func()) {
 	}
 }
 
+var closeSyncOnce sync.Once
+
 // Stop stops the ticker
 func (t *MyTimerImpl) Stop() {
-	close(t.stopChan)
+	closeSyncOnce.Do(func() {
+		close(t.stopChan)
+	})
+
 }
