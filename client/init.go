@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/common/demopb"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/common/demopb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

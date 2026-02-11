@@ -4,10 +4,10 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/pkg/consts"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/pkg/types"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/service"
 	"github.com/gin-gonic/gin"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/consts"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/types"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/service"
 )
 
 // CreateOrder godoc

@@ -8,8 +8,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	paymentpb "github.com/NUS-ISS-Agile-Team/ceramicraft-payment-mservice/common/paymentpb"
 	gomock "github.com/golang/mock/gomock"
+	paymentpb "github.com/sw5005-sus/ceramicraft-payment-mservice/common/paymentpb"
 	grpc "google.golang.org/grpc"
 )
 

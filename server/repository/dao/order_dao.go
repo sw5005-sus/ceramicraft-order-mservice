@@ -5,11 +5,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/log"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/pkg/consts"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/pkg/types"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/model"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/log"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/consts"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/types"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/model"
 	"gorm.io/gorm"
 )
 

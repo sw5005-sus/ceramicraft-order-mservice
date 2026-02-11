@@ -7,8 +7,8 @@ package mocks
 import (
 	reflect "reflect"
 
-	types "github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/pkg/types"
 	gomock "github.com/golang/mock/gomock"
+	types "github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/types"
 )
 
 // MockIOrderStatsCache is a mock of IOrderStatsCache interface.

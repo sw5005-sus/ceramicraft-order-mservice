@@ -1,13 +1,11 @@
-module github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/client
+module github.com/sw5005-sus/ceramicraft-order-mservice/client
 
-go 1.24.9
+go 1.25.7
 
-require (
-	github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/common v0.0.0-20250928114520-6e4343bff960
-	google.golang.org/grpc v1.75.1
-)
+require google.golang.org/grpc v1.75.1
 
 require (
+	github.com/sw5005-sus/ceramicraft-order-mservice/common v0.0.1 // indirect
 	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.26.0 // indirect

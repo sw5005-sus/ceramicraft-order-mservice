@@ -5,8 +5,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/dao/redis"
 	goredis "github.com/redis/go-redis/v9"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/dao/redis"
 )
 
 // mockgen -source=./distributed_lock.go -destination=./mocks/distributed_lock_mock.go -package=mocks

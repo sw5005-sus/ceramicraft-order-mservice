@@ -4,9 +4,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/log"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/pkg/types"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/dao"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/log"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/types"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/dao"
 )
 
 type IOrderStatsCache interface {

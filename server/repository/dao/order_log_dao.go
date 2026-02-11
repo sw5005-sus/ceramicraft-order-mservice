@@ -4,8 +4,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/model"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/model"
 	"gorm.io/gorm"
 )
 

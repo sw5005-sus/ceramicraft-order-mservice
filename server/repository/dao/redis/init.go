@@ -3,8 +3,8 @@ package redis
 import (
 	"fmt"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/config"
 	"github.com/redis/go-redis/v9"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/config"
 )
 
 var RedisClient *redis.Client

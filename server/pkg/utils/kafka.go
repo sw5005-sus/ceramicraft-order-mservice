@@ -6,12 +6,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/config"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/log"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/pkg/types"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/dao"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/model"
 	"github.com/segmentio/kafka-go"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/config"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/log"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/types"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/dao"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/model"
 )
 
 type Writer interface {
