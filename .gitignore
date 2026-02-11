@@ -36,3 +36,5 @@ server/logs/
 .vscode/
 
 server/resources/config-local.yml
+
+.DS_Store
