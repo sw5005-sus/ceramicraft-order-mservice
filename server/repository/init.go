@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/config"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/dao/redis"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/model"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/config"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/dao/redis"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )

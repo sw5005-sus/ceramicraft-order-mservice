@@ -7,17 +7,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/common/productpb"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/clients"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/log"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/pkg/consts"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/pkg/types"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/pkg/utils"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/cache"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/dao"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/model"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-payment-mservice/common/paymentpb"
 	"github.com/google/uuid"
+	"github.com/sw5005-sus/ceramicraft-commodity-mservice/common/productpb"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/clients"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/log"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/consts"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/types"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/utils"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/cache"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/dao"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/model"
+	"github.com/sw5005-sus/ceramicraft-payment-mservice/common/paymentpb"
 )
 
 type OrderService interface {

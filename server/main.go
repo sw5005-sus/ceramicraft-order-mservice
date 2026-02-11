@@ -7,16 +7,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/clients"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/config"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/grpc"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/http"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/log"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/metrics"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/pkg/utils"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/service"
-	userUtils "github.com/NUS-ISS-Agile-Team/ceramicraft-user-mservice/common/utils"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/clients"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/config"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/grpc"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/http"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/log"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/metrics"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/utils"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/service"
+	userUtils "github.com/sw5005-sus/ceramicraft-user-mservice/common/utils"
 )
 
 var (
@@ -47,14 +47,14 @@ func main() {
 }
 
 func startAutoConfirmJob(ctx context.Context, orderService *service.OrderServiceImpl) {
-    timer := utils.NewMyTimer(30 * time.Second)
-    
-    // 创建一个包装函数
-    task := func() {
-        orderService.OrderAutoConfirm(ctx)
-    }
-    
-    go timer.Start(ctx, task)
-    
-    log.Logger.Info("Auto confirm job started")
+	timer := utils.NewMyTimer(30 * time.Second)
+
+	// 创建一个包装函数
+	task := func() {
+		orderService.OrderAutoConfirm(ctx)
+	}
+
+	go timer.Start(ctx, task)
+
+	log.Logger.Info("Auto confirm job started")
 }

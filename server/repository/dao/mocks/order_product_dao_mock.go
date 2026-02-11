@@ -8,8 +8,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	model "github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/model"
 	gomock "github.com/golang/mock/gomock"
+	model "github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/model"
 )
 
 // MockOrderProductDao is a mock of OrderProductDao interface.

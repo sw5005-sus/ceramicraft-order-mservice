@@ -3,14 +3,14 @@ package clients
 import (
 	"sync"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/client"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-commodity-mservice/common/productpb"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/config"
+	"github.com/sw5005-sus/ceramicraft-commodity-mservice/client"
+	"github.com/sw5005-sus/ceramicraft-commodity-mservice/common/productpb"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/config"
 )
 
 var (
 	productClientInstance productpb.ProductServiceClient
-	productClientOnce   sync.Once
+	productClientOnce     sync.Once
 )
 
 func InitProductClient(cfg *config.CommodityClient) productpb.ProductServiceClient {

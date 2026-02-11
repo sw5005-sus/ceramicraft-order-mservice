@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/common/demopb"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/config"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/log"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/common/demopb"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/config"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/log"
 	"google.golang.org/grpc"
 )
 

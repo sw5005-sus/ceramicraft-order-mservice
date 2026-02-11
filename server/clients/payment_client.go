@@ -3,15 +3,15 @@ package clients
 import (
 	"sync"
 
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/config"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/log"
-	paymentClient "github.com/NUS-ISS-Agile-Team/ceramicraft-payment-mservice/client"
-	"github.com/NUS-ISS-Agile-Team/ceramicraft-payment-mservice/common/paymentpb"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/config"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/log"
+	paymentClient "github.com/sw5005-sus/ceramicraft-payment-mservice/client"
+	"github.com/sw5005-sus/ceramicraft-payment-mservice/common/paymentpb"
 )
 
 var (
 	paymentClientInstance paymentpb.PaymentServiceClient
-	paymentClientOnce sync.Once
+	paymentClientOnce     sync.Once
 )
 
 func InitPaymentClient(cfg *config.PaymentClient) {

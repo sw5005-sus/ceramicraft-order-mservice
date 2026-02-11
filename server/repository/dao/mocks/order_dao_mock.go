@@ -9,10 +9,10 @@ import (
 	reflect "reflect"
 	time "time"
 
-	types "github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/pkg/types"
-	dao "github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/dao"
-	model "github.com/NUS-ISS-Agile-Team/ceramicraft-order-mservice/server/repository/model"
 	gomock "github.com/golang/mock/gomock"
+	types "github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/types"
+	dao "github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/dao"
+	model "github.com/sw5005-sus/ceramicraft-order-mservice/server/repository/model"
 )
 
 // MockOrderDao is a mock of OrderDao interface.
