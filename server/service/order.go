@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
 
@@ -159,7 +160,7 @@ func (o *OrderServiceImpl) CreateOrder(ctx context.Context, orderInfo types.Orde
 		ReceiverPhone:     orderInfo.ReceiverPhone,
 		ReceiverAddress:   orderInfo.ReceiverAddress,
 		ReceiverCountry:   orderInfo.ReceiverCountry,
-		ReceiverZipCode:   orderInfo.ReceiverZipCode,
+		ReceiverZipCode:   fmt.Sprintf("%d", orderInfo.ReceiverZipCode),
 		Remark:            orderInfo.Remark,
 		ShippingFee:       shippingFee,
 		Tax:               tax,
@@ -421,7 +422,7 @@ func (o *OrderServiceImpl) GetOrderDetail(ctx context.Context, orderNo string) (
 		ReceiverPhone:     order.ReceiverPhone,
 		ReceiverAddress:   order.ReceiverAddress,
 		ReceiverCountry:   order.ReceiverCountry,
-		ReceiverZipCode:   order.ReceiverZipCode,
+		ReceiverZipCode:   string2Int(order.ReceiverZipCode, 0),
 
 		// 其他信息
 		Remark:      order.Remark,
@@ -433,6 +434,14 @@ func (o *OrderServiceImpl) GetOrderDetail(ctx context.Context, orderNo string) (
 	}
 
 	return detail, nil
+}
+
+func string2Int(s string, defaultVal int) int {
+	ret, err := strconv.Atoi(s)
+	if err != nil {
+		return defaultVal
+	}
+	return ret
 }
 
 // 获取订单状态名称

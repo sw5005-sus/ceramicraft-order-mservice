@@ -7,6 +7,8 @@ import (
 	"syscall"
 	"time"
 
+	ceramicraftsecure "github.com/sw5005-sus/ceramicraft-secure"
+
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/clients"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/config"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/grpc"
@@ -32,6 +34,7 @@ func main() {
 	log.InitLogger()
 	repository.Init()
 	userUtils.InitJwtSecret()
+	ceramicraftsecure.Init()
 	utils.InitKafka()
 	clients.InitAllClients(config.Config)
 	metrics.RegisterMetrics()
