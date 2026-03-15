@@ -37,50 +37,50 @@ func (Order) TableName() string {
 
 func (o *Order) Encrypt() error {
 	if o.ReceiverPhone != "" {
-		encrypReceiverPhone, err := ceramicraftsecure.AesEncrypt(o.ReceiverPhone)
+		encryptedReceiverPhone, err := ceramicraftsecure.AesEncrypt(o.ReceiverPhone)
 		if err != nil {
 			return err
 		}
-		o.ReceiverPhone = encrypReceiverPhone
+		o.ReceiverPhone = encryptedReceiverPhone
 	}
 	if o.ReceiverZipCode != "" {
-		encrypReceiverZipCode, err := ceramicraftsecure.AesEncrypt(o.ReceiverZipCode)
+		encryptedReceiverZipCode, err := ceramicraftsecure.AesEncrypt(o.ReceiverZipCode)
 		if err != nil {
 			return err
 		}
-		o.ReceiverZipCode = encrypReceiverZipCode
+		o.ReceiverZipCode = encryptedReceiverZipCode
 	}
 	if o.ReceiverAddress != "" {
-		encrypReceiverAddress, err := ceramicraftsecure.AesEncrypt(o.ReceiverAddress)
+		encrypedReceiverAddress, err := ceramicraftsecure.AesEncrypt(o.ReceiverAddress)
 		if err != nil {
 			return err
 		}
-		o.ReceiverAddress = encrypReceiverAddress
+		o.ReceiverAddress = encrypedReceiverAddress
 	}
 	return nil
 }
 
 func (o *Order) Decrypt() error {
 	if o.ReceiverPhone != "" {
-		decryptReceiverPhone, err := ceramicraftsecure.AesDecrypt(o.ReceiverPhone)
+		decryptedReceiverPhone, err := ceramicraftsecure.AesDecrypt(o.ReceiverPhone)
 		if err != nil {
 			return err
 		}
-		o.ReceiverPhone = decryptReceiverPhone
+		o.ReceiverPhone = decryptedReceiverPhone
 	}
 	if o.ReceiverZipCode != "" {
-		decryptReceiverZipCode, err := ceramicraftsecure.AesDecrypt(o.ReceiverZipCode)
+		decryptedReceiverZipCode, err := ceramicraftsecure.AesDecrypt(o.ReceiverZipCode)
 		if err != nil {
 			return err
 		}
-		o.ReceiverZipCode = decryptReceiverZipCode
+		o.ReceiverZipCode = decryptedReceiverZipCode
 	}
 	if o.ReceiverAddress != "" {
-		decryptReceiverAddress, err := ceramicraftsecure.AesDecrypt(o.ReceiverAddress)
+		decryptedReceiverAddress, err := ceramicraftsecure.AesDecrypt(o.ReceiverAddress)
 		if err != nil {
 			return err
 		}
-		o.ReceiverAddress = decryptReceiverAddress
+		o.ReceiverAddress = decryptedReceiverAddress
 	}
 	return nil
 }

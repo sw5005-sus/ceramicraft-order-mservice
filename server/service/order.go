@@ -270,10 +270,7 @@ func getOrderMsg(orderId string, orderInfo types.OrderInfo, userId int) (msg str
 		OrderID:           orderId,
 		ReceiverFirstName: orderInfo.ReceiverFirstName,
 		ReceiverLastName:  orderInfo.ReceiverLastName,
-		ReceiverPhone:     orderInfo.ReceiverPhone,
-		ReceiverAddress:   orderInfo.ReceiverAddress,
 		ReceiverCountry:   orderInfo.ReceiverCountry,
-		ReceiverZipCode:   orderInfo.ReceiverZipCode,
 		Remark:            orderInfo.Remark,
 		OrderItemList:     orderInfo.OrderItemList,
 	}

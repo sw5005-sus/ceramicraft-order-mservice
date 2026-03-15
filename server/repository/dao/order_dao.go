@@ -85,6 +85,10 @@ func (d *OrderDaoImpl) UpdateStatusWithDeliveryInfo(ctx context.Context, orderNo
 func (d *OrderDaoImpl) GetByOrderNo(ctx context.Context, orderNo string) (o *model.Order, err error) {
 	o = &model.Order{}
 	err = d.db.WithContext(ctx).Where("order_no = ?", orderNo).First(o).Error
+	if err != nil {
+		return nil, err
+	}
+	err = o.Decrypt()
 	return
 }
 
@@ -126,7 +130,7 @@ func (d *OrderDaoImpl) GetByOrderQuery(ctx context.Context, query OrderQuery) (o
 		err = o.Decrypt()
 		if err != nil {
 			log.Logger.Errorf("Failed to decrypt order data for orderNo %s: %v", o.OrderNo, err)
-			continue
+			return []*model.Order{}, err
 		}
 	}
 	return
