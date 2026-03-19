@@ -1,6 +1,6 @@
 module github.com/sw5005-sus/ceramicraft-order-mservice/client
 
-go 1.25.7
+go 1.25.8
 
 require google.golang.org/grpc v1.75.1
 
