@@ -38,7 +38,8 @@ func NewRouter() *gin.Engine {
 		{
 			merchantGroup.Use(middleware.AuthMiddleware())
 			merchantGroup.POST("/orders/list", api.ListOrders)
-			merchantGroup.GET("/orders/:order_no", api.GetOrderDetail)                                              // get order detail
+			merchantGroup.GET("/orders/:order_no", api.GetOrderDetail)
+			merchantGroup.GET("/orders/:order_no/receive-info", api.GetOrderReceiverInfo)
 			merchantGroup.PATCH("/orders/:order_no/ship", middleware.RequireRoles("merchant_admin"), api.ShipOrder) // ship order
 			merchantGroup.GET("/order-stats", api.GetOrderStats)                                                    // get order stats
 		}

@@ -89,7 +89,7 @@ type OrderDetail struct {
 	ReceiverPhone     string `json:"receiver_phone"`      // 收货人电话
 	ReceiverAddress   string `json:"receiver_address"`    // 收货地址
 	ReceiverCountry   string `json:"receiver_country"`    // 收货人国家
-	ReceiverZipCode   int    `json:"receiver_zip_code"`   // 收货人邮政编码
+	ReceiverZipCode   string `json:"receiver_zip_code"`   // 收货人邮政编码
 
 	// 其他信息
 	Remark      string `json:"remark"`       // 备注
@@ -146,4 +146,33 @@ type OrderStats struct {
 	TotalSales       int `json:"total_sales"`
 	TotalCustomers   int `json:"total_customers"`
 	AvgSalesPerOrder int `json:"avg_sales_per_order"`
+}
+
+func MaskOrderDetail(o *OrderDetail) {
+	o.ReceiverPhone = maskPhone(o.ReceiverPhone)
+	o.ReceiverAddress = maskAddress(o.ReceiverAddress)
+	o.ReceiverZipCode = maskZipcode(string(o.ReceiverZipCode))
+}
+
+func maskPhone(phone string) string {
+	if len(phone) < 7 {
+		return phone
+	}
+	return phone[:3] + "****" + phone[len(phone)-4:]
+}
+
+func maskAddress(address string) string {
+	runeAddr := []rune(address)
+	keepLen := int(float64(len(runeAddr)) * 0.3)
+	if keepLen <= 0 {
+		return address
+	}
+	return string(runeAddr[:keepLen]) + "****"
+}
+
+func maskZipcode(zip string) string {
+	if len(zip) < 6 {
+		return zip
+	}
+	return zip[:2] + "****"
 }

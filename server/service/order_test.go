@@ -475,7 +475,7 @@ func TestOrderServiceImpl_GetOrderDetail_Success(t *testing.T) {
 		orderLogDao:     mockOrderLogDao,
 		syncMode:        true,
 	}
-	detail, err := service.GetOrderDetail(ctx, orderNo)
+	detail, err := service.GetOrderDetail(ctx, orderNo, false)
 	if err != nil {
 		t.Errorf("Expected no error, got: %v", err)
 	}
@@ -508,7 +508,7 @@ func TestOrderServiceImpl_GetOrderDetail_OrderNotFound(t *testing.T) {
 		orderLogDao:     mockOrderLogDao,
 		syncMode:        true,
 	}
-	detail, err := service.GetOrderDetail(ctx, orderNo)
+	detail, err := service.GetOrderDetail(ctx, orderNo, false)
 	if err == nil {
 		t.Errorf("Expected error, got nil")
 	}
@@ -537,7 +537,7 @@ func TestOrderServiceImpl_GetOrderDetail_ProductError(t *testing.T) {
 		orderLogDao:     mockOrderLogDao,
 		syncMode:        true,
 	}
-	detail, err := service.GetOrderDetail(ctx, orderNo)
+	detail, err := service.GetOrderDetail(ctx, orderNo, false)
 	if err == nil {
 		t.Errorf("Expected error, got nil")
 	}
@@ -568,7 +568,7 @@ func TestOrderServiceImpl_GetOrderDetail_LogError(t *testing.T) {
 		orderLogDao:     mockOrderLogDao,
 		syncMode:        true,
 	}
-	detail, err := service.GetOrderDetail(ctx, orderNo)
+	detail, err := service.GetOrderDetail(ctx, orderNo, false)
 	if err == nil {
 		t.Errorf("Expected error, got nil")
 	}

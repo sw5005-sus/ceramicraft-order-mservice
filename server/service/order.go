@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"sync"
 	"time"
 
@@ -344,8 +343,29 @@ func (o *OrderServiceImpl) ListOrders(ctx context.Context, req types.ListOrderRe
 	return resp, nil
 }
 
-// GetOrderDetail 根据订单号查询订单详情
-func (o *OrderServiceImpl) GetOrderDetail(ctx context.Context, orderNo string) (detail *types.OrderDetail, err error) {
+// GetOrderShipDetail 根据订单号查询收货信息，不脱敏
+func (o *OrderServiceImpl) GetOrderReceiveDetail(ctx context.Context, orderNo string) (detail *types.OrderDetail, err error) {
+	order, err := o.orderDao.GetByOrderNo(ctx, orderNo)
+	if err != nil {
+		log.Logger.Errorf("GetOrderShipDetail: get order failed, orderNo: %s, err: %s", orderNo, err.Error())
+		return nil, err
+	}
+
+	detail = &types.OrderDetail{
+		OrderNo:           order.OrderNo,
+		ReceiverFirstName: order.ReceiverFirstName,
+		ReceiverLastName:  order.ReceiverLastName,
+		ReceiverPhone:     order.ReceiverPhone,
+		ReceiverAddress:   order.ReceiverAddress,
+		ReceiverCountry:   order.ReceiverCountry,
+		ReceiverZipCode:   order.ReceiverZipCode,
+	}
+
+	return detail, nil
+}
+
+// GetOrderDetailWithMask 根据订单号查询订单详情, 脱敏
+func (o *OrderServiceImpl) GetOrderDetail(ctx context.Context, orderNo string, mask bool) (detail *types.OrderDetail, err error) {
 	// 1. 查询订单基本信息
 	order, err := o.orderDao.GetByOrderNo(ctx, orderNo)
 	if err != nil {
@@ -419,7 +439,7 @@ func (o *OrderServiceImpl) GetOrderDetail(ctx context.Context, orderNo string) (
 		ReceiverPhone:     order.ReceiverPhone,
 		ReceiverAddress:   order.ReceiverAddress,
 		ReceiverCountry:   order.ReceiverCountry,
-		ReceiverZipCode:   string2Int(order.ReceiverZipCode, 0),
+		ReceiverZipCode:   order.ReceiverZipCode,
 
 		// 其他信息
 		Remark:      order.Remark,
@@ -429,16 +449,10 @@ func (o *OrderServiceImpl) GetOrderDetail(ctx context.Context, orderNo string) (
 		OrderItems: orderItems,
 		StatusLogs: statusLogs,
 	}
-
-	return detail, nil
-}
-
-func string2Int(s string, defaultVal int) int {
-	ret, err := strconv.Atoi(s)
-	if err != nil {
-		return defaultVal
+	if mask {
+		types.MaskOrderDetail(detail)
 	}
-	return ret
+	return detail, nil
 }
 
 // 获取订单状态名称
@@ -460,7 +474,7 @@ func getOrderStatusName(status int) string {
 }
 
 func (o *OrderServiceImpl) CustomerGetOrderDetail(ctx context.Context, orderNo string, userId int) (detail *types.OrderDetail, err error) {
-	orderInfo, err := o.GetOrderDetail(ctx, orderNo)
+	orderInfo, err := o.GetOrderDetail(ctx, orderNo, false)
 	if err != nil {
 		log.Logger.Errorf("CustomerGetOrderDetail: get order detail failed, err %s", err.Error())
 		return nil, err

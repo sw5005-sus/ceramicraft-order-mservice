@@ -90,12 +90,38 @@ func GetOrderDetail(ctx *gin.Context) {
 		return
 	}
 
-	detail, err := service.GetOrderServiceInstance().GetOrderDetail(ctx, orderNo)
+	detail, err := service.GetOrderServiceInstance().GetOrderDetail(ctx, orderNo, true)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, RespError(ctx, err))
 		return
 	}
+	ctx.JSON(http.StatusOK, RespSuccess(ctx, detail))
+}
 
+// GetOrderReceiverInfo godoc
+// @Summary 查询订单收货详情
+// @Description 根据订单号查询订单收货信息，不脱敏
+// @Tags Order
+// @Accept json
+// @Produce json
+// @Param order_no path string true "订单号"
+// @Success 200 {object} Response{data=types.OrderDetail}
+// @Failure 400 {object} Response
+// @Failure 404 {object} Response
+// @Failure 500 {object} Response
+// @Router /merchant/orders/{order_no}/receive-info [get]
+func GetOrderReceiverInfo(ctx *gin.Context) {
+	orderNo := ctx.Param("order_no")
+	if orderNo == "" {
+		ctx.JSON(http.StatusBadRequest, RespError(ctx, errors.New("订单号不能为空")))
+		return
+	}
+
+	detail, err := service.GetOrderServiceInstance().GetOrderReceiveDetail(ctx, orderNo)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, RespError(ctx, err))
+		return
+	}
 	ctx.JSON(http.StatusOK, RespSuccess(ctx, detail))
 }
 
