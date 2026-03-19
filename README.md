@@ -1,7 +1,7 @@
 # ceramicraft-order-mservice
 # 🚀 [ceramicraft-order-mservice]: transaction and order management system
 
-![Go Version](https://img.shields.io/badge/go-1.25.7-blue.svg)
+![Go Version](https://img.shields.io/badge/go-1.25.8-blue.svg)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
@@ -46,7 +46,7 @@ This service is part of the **cerami-craft** project, responsible for order-rela
 
 ### Prerequisites
 
-* Go `[1.25.7]`
+* Go `[1.25.8]`
 * docker compose
 
 ### Deployment with Docker Compose
