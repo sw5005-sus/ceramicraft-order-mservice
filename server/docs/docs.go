@@ -370,6 +370,68 @@ const docTemplate = `{
                 }
             }
         },
+        "/merchant/orders/{order_no}/receive-info": {
+            "get": {
+                "description": "根据订单号查询订单收货信息，不脱敏",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Order"
+                ],
+                "summary": "查询订单收货详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "订单号",
+                        "name": "order_no",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/types.OrderDetail"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/merchant/orders/{order_no}/ship": {
             "patch": {
                 "description": "商家标记订单为已发货状态，并添加物流单号",
@@ -569,7 +631,7 @@ const docTemplate = `{
                 },
                 "receiver_zip_code": {
                     "description": "收货人邮政编码",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "remark": {
                     "description": "其他信息",

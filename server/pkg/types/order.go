@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 // OrderInfo service layer input
 type OrderInfo struct {
@@ -89,7 +92,7 @@ type OrderDetail struct {
 	ReceiverPhone     string `json:"receiver_phone"`      // 收货人电话
 	ReceiverAddress   string `json:"receiver_address"`    // 收货地址
 	ReceiverCountry   string `json:"receiver_country"`    // 收货人国家
-	ReceiverZipCode   int    `json:"receiver_zip_code"`   // 收货人邮政编码
+	ReceiverZipCode   string `json:"receiver_zip_code"`   // 收货人邮政编码
 
 	// 其他信息
 	Remark      string `json:"remark"`       // 备注
@@ -146,4 +149,50 @@ type OrderStats struct {
 	TotalSales       int `json:"total_sales"`
 	TotalCustomers   int `json:"total_customers"`
 	AvgSalesPerOrder int `json:"avg_sales_per_order"`
+}
+
+func MaskOrderDetail(o *OrderDetail) {
+	o.ReceiverPhone = maskPhone(o.ReceiverPhone)
+	o.ReceiverAddress = maskAddress(o.ReceiverAddress)
+	o.ReceiverZipCode = maskZipcode(o.ReceiverZipCode)
+}
+
+func maskPhone(phone string) string {
+	length := len(phone)
+	if length == 0 {
+		return phone
+	}
+	if length <= 4 {
+		return strings.Repeat("*", length)
+	}
+	return phone[:3] + "****" + phone[len(phone)-4:]
+}
+
+func maskAddress(address string) string {
+	runeAddr := []rune(address)
+	addrLen := len(runeAddr)
+	if addrLen == 0 {
+		return address
+	}
+	keepLen := int(float64(addrLen) * 0.3)
+	if keepLen <= 0 {
+		if addrLen == 1 {
+			return "*"
+		}
+		return string(runeAddr[:1]) + strings.Repeat("*", addrLen-1)
+	}
+	return string(runeAddr[:keepLen]) + "****"
+}
+
+func maskZipcode(zip string) string {
+	length := len(zip)
+	if length == 0 {
+		return zip
+	}
+	if length <= 2 {
+		// Mask all characters for very short ZIP codes.
+		return strings.Repeat("*", length)
+	}
+	// Keep the first 2 characters and mask the rest, regardless of length.
+	return zip[:2] + strings.Repeat("*", length-2)
 }

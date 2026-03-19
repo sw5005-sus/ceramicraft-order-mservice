@@ -475,7 +475,7 @@ func TestOrderServiceImpl_GetOrderDetail_Success(t *testing.T) {
 		orderLogDao:     mockOrderLogDao,
 		syncMode:        true,
 	}
-	detail, err := service.GetOrderDetail(ctx, orderNo)
+	detail, err := service.GetOrderDetail(ctx, orderNo, false)
 	if err != nil {
 		t.Errorf("Expected no error, got: %v", err)
 	}
@@ -508,7 +508,7 @@ func TestOrderServiceImpl_GetOrderDetail_OrderNotFound(t *testing.T) {
 		orderLogDao:     mockOrderLogDao,
 		syncMode:        true,
 	}
-	detail, err := service.GetOrderDetail(ctx, orderNo)
+	detail, err := service.GetOrderDetail(ctx, orderNo, false)
 	if err == nil {
 		t.Errorf("Expected error, got nil")
 	}
@@ -537,7 +537,7 @@ func TestOrderServiceImpl_GetOrderDetail_ProductError(t *testing.T) {
 		orderLogDao:     mockOrderLogDao,
 		syncMode:        true,
 	}
-	detail, err := service.GetOrderDetail(ctx, orderNo)
+	detail, err := service.GetOrderDetail(ctx, orderNo, false)
 	if err == nil {
 		t.Errorf("Expected error, got nil")
 	}
@@ -568,7 +568,7 @@ func TestOrderServiceImpl_GetOrderDetail_LogError(t *testing.T) {
 		orderLogDao:     mockOrderLogDao,
 		syncMode:        true,
 	}
-	detail, err := service.GetOrderDetail(ctx, orderNo)
+	detail, err := service.GetOrderDetail(ctx, orderNo, false)
 	if err == nil {
 		t.Errorf("Expected error, got nil")
 	}
@@ -1635,5 +1635,180 @@ func TestOrderServiceImpl_GetOrderStats_Error(t *testing.T) {
 	}
 	if stats != (types.OrderStats{}) {
 		t.Errorf("Expected empty stats, got: %v", stats)
+	}
+}
+
+func TestOrderServiceImpl_GetOrderReceiveDetail_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockOrderDao := daoMocks.NewMockOrderDao(ctrl)
+
+	ctx := context.TODO()
+	orderNo := "test-order-123"
+	expectedDetail := &types.OrderDetail{
+		OrderNo:           orderNo,
+		ReceiverFirstName: "John",
+		ReceiverLastName:  "Doe",
+		ReceiverPhone:     "1234567890",
+		ReceiverAddress:   "123 Test St",
+		ReceiverCountry:   "USA",
+		ReceiverZipCode:   "12345",
+	}
+
+	// Mock order DAO - successful retrieval
+	mockOrderDao.EXPECT().
+		GetByOrderNo(ctx, orderNo).
+		Return(&model.Order{
+			OrderNo:           orderNo,
+			ReceiverFirstName: expectedDetail.ReceiverFirstName,
+			ReceiverLastName:  expectedDetail.ReceiverLastName,
+			ReceiverPhone:     expectedDetail.ReceiverPhone,
+			ReceiverAddress:   expectedDetail.ReceiverAddress,
+			ReceiverCountry:   expectedDetail.ReceiverCountry,
+			ReceiverZipCode:   expectedDetail.ReceiverZipCode,
+		}, nil).
+		Times(1)
+
+	service := &OrderServiceImpl{
+		orderDao: mockOrderDao,
+	}
+
+	detail, err := service.GetOrderReceiveDetail(ctx, orderNo)
+	if err != nil {
+		t.Errorf("Expected no error, got: %s", err.Error())
+	}
+	if detail.OrderNo != expectedDetail.OrderNo ||
+		detail.ReceiverFirstName != expectedDetail.ReceiverFirstName ||
+		detail.ReceiverLastName != expectedDetail.ReceiverLastName ||
+		detail.ReceiverPhone != expectedDetail.ReceiverPhone ||
+		detail.ReceiverAddress != expectedDetail.ReceiverAddress ||
+		detail.ReceiverCountry != expectedDetail.ReceiverCountry ||
+		detail.ReceiverZipCode != expectedDetail.ReceiverZipCode {
+		t.Errorf("Expected detail: %+v, got: %+v", expectedDetail, detail)
+	}
+}
+
+func TestOrderServiceImpl_GetOrderReceiveDetail_OrderNotFound(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockOrderDao := daoMocks.NewMockOrderDao(ctrl)
+
+	ctx := context.TODO()
+	orderNo := "non-existent-order"
+
+	// Mock order DAO - return error for non-existent order
+	mockOrderDao.EXPECT().
+		GetByOrderNo(ctx, orderNo).
+		Return(nil, errors.New("order not found")).
+		Times(1)
+
+	service := &OrderServiceImpl{
+		orderDao: mockOrderDao,
+	}
+
+	detail, err := service.GetOrderReceiveDetail(ctx, orderNo)
+	if err == nil {
+		t.Errorf("Expected error, got nil")
+	}
+	if detail != nil {
+		t.Errorf("Expected detail to be nil, got: %+v", detail)
+	}
+}
+func TestOrderServiceImpl_GetOrderDetail_WithMask_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	// Create mocks
+	mockOrderDao := daoMocks.NewMockOrderDao(ctrl)
+	mockOrderProductDao := daoMocks.NewMockOrderProductDao(ctrl)
+	mockOrderLogDao := daoMocks.NewMockOrderLogDao(ctrl)
+
+	// Setup test data
+	ctx := context.TODO()
+	orderNo := "test-order-123"
+	order := &model.Order{
+		OrderNo:           orderNo,
+		UserID:            123,
+		Status:            consts.CREATED,
+		TotalAmount:       1000,
+		PayAmount:         1000,
+		ShippingFee:       100,
+		Tax:               90,
+		CreateTime:        time.Now(),
+		UpdateTime:        time.Now(),
+		ReceiverFirstName: "John",
+		ReceiverLastName:  "Doe",
+		ReceiverPhone:     "1234567890",
+		ReceiverAddress:   "123 Test St",
+		ReceiverCountry:   "USA",
+		ReceiverZipCode:   "12345",
+		Remark:            "Test order",
+	}
+
+	orderProducts := []*model.OrderProduct{
+		{
+			ID:          1,
+			ProductID:   1,
+			ProductName: "Test Product",
+			Price:       500,
+			Quantity:    1,
+			TotalPrice:  500,
+			CreateTime:  time.Now(),
+			UpdateTime:  time.Now(),
+		},
+	}
+
+	orderLogs := []*model.OrderStatusLog{
+		{
+			ID:            1,
+			OrderNo:       orderNo,
+			CurrentStatus: consts.CREATED,
+			Remark:        "Order created",
+			CreateTime:    time.Now(),
+		},
+	}
+
+	// Mock the DAO methods
+	mockOrderDao.EXPECT().GetByOrderNo(ctx, orderNo).Return(order, nil)
+	mockOrderProductDao.EXPECT().GetByOrderNo(ctx, orderNo).Return(orderProducts, nil)
+	mockOrderLogDao.EXPECT().GetByOrderNo(ctx, orderNo).Return(orderLogs, nil)
+
+	// Create service instance with mocks
+	service := &OrderServiceImpl{
+		orderDao:        mockOrderDao,
+		orderProductDao: mockOrderProductDao,
+		orderLogDao:     mockOrderLogDao,
+	}
+
+	// Test the GetOrderDetail method with mask set to true
+	detail, err := service.GetOrderDetail(ctx, orderNo, true)
+	if err != nil {
+		t.Errorf("Expected no error, got: %s", err.Error())
+	}
+	if detail.OrderNo != order.OrderNo {
+		t.Errorf("Expected orderNo to be %s, got: %s", order.OrderNo, detail.OrderNo)
+	}
+	if detail.ReceiverFirstName != order.ReceiverFirstName {
+		t.Errorf("Expected ReceiverFirstName to be %s, got: %s", order.ReceiverFirstName, detail.ReceiverFirstName)
+	}
+	if detail.ReceiverLastName != order.ReceiverLastName {
+		t.Errorf("Expected ReceiverLastName to be %s, got: %s", order.ReceiverLastName, detail.ReceiverLastName)
+	}
+	expectMaskPhone := "123****7890"
+	if detail.ReceiverPhone != expectMaskPhone {
+		t.Errorf("Expected ReceiverPhone to be %s, got: %s", expectMaskPhone, detail.ReceiverPhone)
+	}
+	expectMaskAddress := "123****"
+	if detail.ReceiverAddress != expectMaskAddress {
+		t.Errorf("Expected ReceiverAddress to be %s, got: %s", expectMaskAddress, detail.ReceiverAddress)
+	}
+	if detail.ReceiverCountry != order.ReceiverCountry {
+		t.Errorf("Expected ReceiverCountry to be %s, got: %s", order.ReceiverCountry, detail.ReceiverCountry)
+	}
+	expectMaskZipCode := "12***"
+	if detail.ReceiverZipCode != expectMaskZipCode {
+		t.Errorf("Expected ReceiverZipCode to be %s, got: %s", expectMaskZipCode, detail.ReceiverZipCode)
 	}
 }
