@@ -23,9 +23,10 @@ import (
 type OrderService interface {
 	CreateOrder(ctx context.Context, orderInfo types.OrderInfo, userID int) (orderNo string, err error)
 	ListOrders(ctx context.Context, req types.ListOrderRequest) (resp *types.ListOrderResponse, err error)
-	GetOrderDetail(ctx context.Context, orderNo string) (detail *types.OrderDetail, err error)
+	GetOrderDetail(ctx context.Context, orderNo string, mask bool) (detail *types.OrderDetail, err error)
+	GetOrderReceiveDetail(ctx context.Context, orderNo string) (detail *types.OrderDetail, err error)
 	CustomerGetOrderDetail(ctx context.Context, orderNo string, userID int) (detail *types.OrderDetail, err error)
-	UpdateOrderStatus(ctx context.Context, orderNo string, newStatus int) (err error)
+	UpdateOrderStatus(ctx context.Context, orderNo string, newStatus int, shippingNo string) (err error)
 	OrderAutoConfirm(ctx context.Context)
 	GetOrderStats(ctx context.Context) (stats types.OrderStats, err error)
 }
@@ -343,7 +344,7 @@ func (o *OrderServiceImpl) ListOrders(ctx context.Context, req types.ListOrderRe
 	return resp, nil
 }
 
-// GetOrderShipDetail 根据订单号查询收货信息，不脱敏
+// GetOrderReceiveDetail 根据订单号查询收货信息，不脱敏
 func (o *OrderServiceImpl) GetOrderReceiveDetail(ctx context.Context, orderNo string) (detail *types.OrderDetail, err error) {
 	order, err := o.orderDao.GetByOrderNo(ctx, orderNo)
 	if err != nil {

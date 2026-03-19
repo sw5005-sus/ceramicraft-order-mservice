@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 // OrderInfo service layer input
 type OrderInfo struct {
@@ -151,28 +154,45 @@ type OrderStats struct {
 func MaskOrderDetail(o *OrderDetail) {
 	o.ReceiverPhone = maskPhone(o.ReceiverPhone)
 	o.ReceiverAddress = maskAddress(o.ReceiverAddress)
-	o.ReceiverZipCode = maskZipcode(string(o.ReceiverZipCode))
+	o.ReceiverZipCode = maskZipcode(o.ReceiverZipCode)
 }
 
 func maskPhone(phone string) string {
-	if len(phone) < 7 {
+	length := len(phone)
+	if length == 0 {
 		return phone
+	}
+	if length <= 4 {
+		return strings.Repeat("*", length)
 	}
 	return phone[:3] + "****" + phone[len(phone)-4:]
 }
 
 func maskAddress(address string) string {
 	runeAddr := []rune(address)
-	keepLen := int(float64(len(runeAddr)) * 0.3)
-	if keepLen <= 0 {
+	addrLen := len(runeAddr)
+	if addrLen == 0 {
 		return address
+	}
+	keepLen := int(float64(addrLen) * 0.3)
+	if keepLen <= 0 {
+		if addrLen == 1 {
+			return "*"
+		}
+		return string(runeAddr[:1]) + strings.Repeat("*", addrLen-1)
 	}
 	return string(runeAddr[:keepLen]) + "****"
 }
 
 func maskZipcode(zip string) string {
-	if len(zip) < 6 {
+	length := len(zip)
+	if length == 0 {
 		return zip
 	}
-	return zip[:2] + "****"
+	if length <= 2 {
+		// Mask all characters for very short ZIP codes.
+		return strings.Repeat("*", length)
+	}
+	// Keep the first 2 characters and mask the rest, regardless of length.
+	return zip[:2] + strings.Repeat("*", length-2)
 }

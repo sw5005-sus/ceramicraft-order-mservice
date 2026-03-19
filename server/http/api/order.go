@@ -8,6 +8,7 @@ import (
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/consts"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/types"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/service"
+	"gorm.io/gorm"
 )
 
 // CreateOrder godoc
@@ -119,6 +120,10 @@ func GetOrderReceiverInfo(ctx *gin.Context) {
 
 	detail, err := service.GetOrderServiceInstance().GetOrderReceiveDetail(ctx, orderNo)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, RespError(ctx, err))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, RespError(ctx, err))
 		return
 	}
