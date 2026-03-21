@@ -1812,3 +1812,24 @@ func TestOrderServiceImpl_GetOrderDetail_WithMask_Success(t *testing.T) {
 		t.Errorf("Expected ReceiverZipCode to be %s, got: %s", expectMaskZipCode, detail.ReceiverZipCode)
 	}
 }
+func TestStrictSanitization(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"<b>bold</b>", "bold"},                           // HTML tags should be removed
+		{"<script>alert('xss')</script>", ""},             // Script tags should be removed
+		{"normal text", "normal text"},                    // Normal text should remain unchanged
+		{"<a href='http://example.com'>link</a>", "link"}, // Anchor tags should be sanitized
+		{"<div>div content</div>", "div content"},         // Div tags should be removed
+	}
+
+	for _, test := range tests {
+		t.Run(test.input, func(t *testing.T) {
+			result := strictSanitization(test.input)
+			if result != test.expected {
+				t.Errorf("Expected '%s', got '%s'", test.expected, result)
+			}
+		})
+	}
+}

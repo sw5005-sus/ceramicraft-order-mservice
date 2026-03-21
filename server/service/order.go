@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/sw5005-sus/ceramicraft-commodity-mservice/common/productpb"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/clients"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/log"
@@ -155,13 +156,13 @@ func (o *OrderServiceImpl) CreateOrder(ctx context.Context, orderInfo types.Orde
 		TotalAmount:       itemTotalAmount + shippingFee + tax,
 		CreateTime:        currentTime,
 		UpdateTime:        currentTime,
-		ReceiverFirstName: orderInfo.ReceiverFirstName,
-		ReceiverLastName:  orderInfo.ReceiverLastName,
+		ReceiverFirstName: strictSanitization(orderInfo.ReceiverFirstName),
+		ReceiverLastName:  strictSanitization(orderInfo.ReceiverLastName),
 		ReceiverPhone:     orderInfo.ReceiverPhone,
-		ReceiverAddress:   orderInfo.ReceiverAddress,
-		ReceiverCountry:   orderInfo.ReceiverCountry,
+		ReceiverAddress:   strictSanitization(orderInfo.ReceiverAddress),
+		ReceiverCountry:   strictSanitization(orderInfo.ReceiverCountry),
 		ReceiverZipCode:   fmt.Sprintf("%d", orderInfo.ReceiverZipCode),
-		Remark:            orderInfo.Remark,
+		Remark:            strictSanitization(orderInfo.Remark),
 		ShippingFee:       shippingFee,
 		Tax:               tax,
 	})
@@ -534,4 +535,14 @@ func (o *OrderServiceImpl) UpdateOrderStatus(ctx context.Context, orderNo string
 
 func (o *OrderServiceImpl) GetOrderStats(ctx context.Context) (stats types.OrderStats, err error) {
 	return o.orderStatsCache.GetOrderStats()
+}
+
+var (
+	pStrict = bluemonday.StrictPolicy()
+)
+
+func strictSanitization(input string) string {
+	ret := pStrict.Sanitize(input)
+	log.Logger.Infof("strictSanitization: input = %s, output = %s", input, ret)
+	return ret
 }
