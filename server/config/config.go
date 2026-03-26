@@ -14,7 +14,7 @@ type Conf struct {
 	HttpConfig      *HttpConfig      `mapstructure:"http"`
 	MySQLConfig     *MySQL           `mapstructure:"mysql"`
 	CommodityClient *CommodityClient `mapstructure:"commodityClient"`
-	PaymentClient   *PaymentClient   `mapstruct:"paymentClient"`
+	PaymentClient   *PaymentClient   `mapstructure:"paymentClient"`
 	KafkaConfig     *KafkaConfig     `mapstructure:"kafka"`
 	RedisConfig     *RedisConfig     `mapstructure:"redis"`
 }
