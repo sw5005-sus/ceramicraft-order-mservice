@@ -17,6 +17,7 @@ type Conf struct {
 	PaymentClient   *PaymentClient   `mapstructure:"paymentClient"`
 	KafkaConfig     *KafkaConfig     `mapstructure:"kafka"`
 	RedisConfig     *RedisConfig     `mapstructure:"redis"`
+	AuditClient     *GrpcConfig      `mapstructure:"auditClient"`
 }
 
 type RedisConfig struct {
