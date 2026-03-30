@@ -33,3 +33,7 @@ kafka:
 redis:
   host: "redis-container"
   port: 6379
+
+auditClient:
+  host: "localhost"
+  port: 50051

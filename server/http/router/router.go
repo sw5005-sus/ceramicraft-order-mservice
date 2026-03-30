@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
+	auditclient "github.com/sw5005-sus/ceramicraft-audit-client"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/config"
 	_ "github.com/sw5005-sus/ceramicraft-order-mservice/server/docs"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/http/api"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/metrics"
@@ -18,7 +20,10 @@ const (
 
 func NewRouter() *gin.Engine {
 	r := gin.Default()
-
+	auditMiddleware := auditclient.AuditMiddleware(
+		"order-ms",
+		config.Config.AuditClient.Host,
+		config.Config.AuditClient.Port)
 	basicGroup := r.Group(serviceURIPrefix)
 	{
 		basicGroup.Use(metrics.MetricsMiddleware())
@@ -39,9 +44,9 @@ func NewRouter() *gin.Engine {
 			merchantGroup.Use(middleware.AuthMiddleware())
 			merchantGroup.POST("/orders/list", api.ListOrders)
 			merchantGroup.GET("/orders/:order_no", api.GetOrderDetail)
-			merchantGroup.GET("/orders/:order_no/receive-info", api.GetOrderReceiverInfo)
-			merchantGroup.PATCH("/orders/:order_no/ship", middleware.RequireRoles("merchant_admin"), api.ShipOrder) // ship order
-			merchantGroup.GET("/order-stats", api.GetOrderStats)                                                    // get order stats
+			merchantGroup.GET("/orders/:order_no/receive-info", middleware.RequireRoles("merchant_admin"), auditMiddleware, api.GetOrderReceiverInfo)
+			merchantGroup.PATCH("/orders/:order_no/ship", middleware.RequireRoles("merchant_admin"), auditMiddleware, api.ShipOrder) // ship order
+			merchantGroup.GET("/order-stats", api.GetOrderStats)                                                                     // get order stats
 		}
 
 		customerGroup := basicGroup.Group("/customer")
