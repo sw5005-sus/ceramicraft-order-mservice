@@ -225,6 +225,8 @@ github.com/sw5005-sus/ceramicraft-payment-mservice/client v0.0.1 h1:W3dqd7nvhWeX
 github.com/sw5005-sus/ceramicraft-payment-mservice/client v0.0.1/go.mod h1:eMX7FL44QE/VxcwNoDm9n3GcnIu+9pVM/ZqPLHQ7CYg=
 github.com/sw5005-sus/ceramicraft-payment-mservice/common v0.0.1 h1:lQtC193p1L4p7nR6bdJFPcWdCrvRgLxV5REe4YXwDBA=
 github.com/sw5005-sus/ceramicraft-payment-mservice/common v0.0.1/go.mod h1:HYTlo3kFdJTO8+pACgEzy0ymWUJE/sjEmiH7/1WLttw=
+github.com/sw5005-sus/ceramicraft-push-client v0.0.1 h1:2AzjeEN0bsc3q8hQ1YKRhDdaz+zbHvYtf6tUs5p21ZY=
+github.com/sw5005-sus/ceramicraft-push-client v0.0.1/go.mod h1:MBQkerP9bw1/VnvOOvFuXqDCM63vOl2vro6lw7LsJKw=
 github.com/sw5005-sus/ceramicraft-secure v0.0.2 h1:H+iZGWrvsbkIl6pdxMx91BUWRDLHJMtE9avJrhzGMWE=
 github.com/sw5005-sus/ceramicraft-secure v0.0.2/go.mod h1:NaJKe5D7ivC6tBA8XNrOsrev/Kl7OsFbQjNG54Pob5g=
 github.com/sw5005-sus/ceramicraft-user-mservice/common v0.0.14 h1:ALUnCeVFyLFpPu+rRkCJMTf45aGXF7Vn278kQBtKG3g=
@@ -338,8 +340,8 @@ google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 h1:
 google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217/go.mod h1:7i2o+ce6H/6BluujYR+kqX3GKH+dChPTQU19wjRPiGk=
 google.golang.org/grpc v1.79.3 h1:sybAEdRIEtvcD68Gx7dmnwjZKlyfuc61Dyo9pGXXkKE=
 google.golang.org/grpc v1.79.3/go.mod h1:KmT0Kjez+0dde/v2j9vzwoAScgEPx/Bw1CYChhHLrHQ=
-google.golang.org/protobuf v1.36.10 h1:AYd7cD/uASjIL6Q9LiTjz8JLcrh/88q5UObnmY3aOOE=
-google.golang.org/protobuf v1.36.10/go.mod h1:HTf+CrKn2C3g5S8VImy6tdcUvCska2kB7j23XfzDpco=
+google.golang.org/protobuf v1.36.11 h1:fV6ZwhNocDyBLK0dj+fg8ektcVegBBuEolpbTQyBNVE=
+google.golang.org/protobuf v1.36.11/go.mod h1:HTf+CrKn2C3g5S8VImy6tdcUvCska2kB7j23XfzDpco=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=

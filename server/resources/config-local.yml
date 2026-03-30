@@ -37,3 +37,7 @@ redis:
 auditClient:
   host: "localhost"
   port: 50051
+
+pushClient:
+  host: "localhost"
+  port: 50052

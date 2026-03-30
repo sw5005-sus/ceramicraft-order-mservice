@@ -1099,6 +1099,7 @@ func TestOrderServiceImpl_UpdateOrderStatus_ToShipped_Success(t *testing.T) {
 
 	mockOrderDao := daoMocks.NewMockOrderDao(ctrl)
 	mockMessageWriter := utilMocks.NewMockWriter(ctrl)
+	mockPushClient := mocks.NewMockIPushClient(ctrl)
 
 	ctx := context.Background()
 	orderNo := "TEST001"
@@ -1114,11 +1115,15 @@ func TestOrderServiceImpl_UpdateOrderStatus_ToShipped_Success(t *testing.T) {
 
 	// Mock successful Kafka message
 	mockMessageWriter.EXPECT().SendMsg(ctx, "order_status_changed", gomock.Any(), gomock.Any()).Return(nil)
+	// Mock successful push notification
+	mockPushClient.EXPECT().SendPushNotification(ctx, gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		Return(nil)
 
 	service := &OrderServiceImpl{
 		orderDao:      mockOrderDao,
 		messageWriter: mockMessageWriter,
 		syncMode:      true,
+		pushClient:    mockPushClient,
 	}
 
 	err := service.UpdateOrderStatus(ctx, orderNo, newStatus, logisticsInfo)
