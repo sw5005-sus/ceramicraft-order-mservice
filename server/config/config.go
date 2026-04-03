@@ -18,6 +18,7 @@ type Conf struct {
 	KafkaConfig     *KafkaConfig     `mapstructure:"kafka"`
 	RedisConfig     *RedisConfig     `mapstructure:"redis"`
 	AuditClient     *GrpcConfig      `mapstructure:"auditClient"`
+	PushClient      *GrpcConfig      `mapstructure:"pushClient"`
 }
 
 type RedisConfig struct {

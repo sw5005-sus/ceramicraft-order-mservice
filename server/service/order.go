@@ -43,6 +43,7 @@ type OrderServiceImpl struct {
 	messageWriter        utils.Writer
 	distributedLocker    utils.Locker
 	syncMode             bool
+	pushClient           clients.IPushClient
 }
 
 func GetOrderServiceInstance() *OrderServiceImpl {
@@ -56,6 +57,7 @@ func GetOrderServiceInstance() *OrderServiceImpl {
 		messageWriter:        utils.GetWriter(),
 		distributedLocker:    utils.GetDistributedLock(AUTO_CONFIRM_LOCK_KEY, uuid.New().String(), LOCK_EXP_TIME),
 		syncMode:             false,
+		pushClient:           clients.GetPushClient(),
 	}
 }
 
@@ -515,6 +517,7 @@ func (o *OrderServiceImpl) UpdateOrderStatus(ctx context.Context, orderNo string
 		if err != nil {
 			return err
 		}
+		go o.pushShippingMessage(ctx, orderInfo, shippingNo)
 	default:
 		defaultErr := fmt.Errorf("UpdateOrderStatus: status no support, cur status %d", newStatus)
 		return defaultErr
@@ -531,6 +534,28 @@ func (o *OrderServiceImpl) UpdateOrderStatus(ctx context.Context, orderNo string
 	}
 
 	return nil
+}
+
+func (o *OrderServiceImpl) pushShippingMessage(ctx context.Context, orderInfo *model.Order, shippingNo string) {
+	if o.pushClient == nil {
+		log.Logger.Warnf("Push client is not initialized, skipping push notification for shipped order %s", orderInfo.OrderNo)
+		return
+	}
+	title := "Your CeramiCraft order is on its way!"
+	body := "Great news! Your handcrafted pieces have been shipped. Tap to track your package."
+	data := map[string]string{
+		"title":       title,
+		"order_no":    orderInfo.OrderNo,
+		"shipping_no": shippingNo,
+		"action_type": "ORDER_DETAIL",
+		"target_url":  fmt.Sprintf("ceramicraft://orders/%s", orderInfo.OrderNo), // no use
+	}
+	err := o.pushClient.SendPushNotification(ctx, orderInfo.UserID, title, body, data)
+	if err != nil {
+		log.Logger.Errorf("Failed to send push notification for shipped order %s: %v", orderInfo.OrderNo, err)
+	} else {
+		log.Logger.Infof("Push notification sent for shipped order %s", orderInfo.OrderNo)
+	}
 }
 
 func (o *OrderServiceImpl) GetOrderStats(ctx context.Context) (stats types.OrderStats, err error) {
