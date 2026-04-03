@@ -1117,7 +1117,7 @@ func TestOrderServiceImpl_UpdateOrderStatus_ToShipped_Success(t *testing.T) {
 	mockMessageWriter.EXPECT().SendMsg(ctx, "order_status_changed", gomock.Any(), gomock.Any()).Return(nil)
 	// Mock successful push notification
 	mockPushClient.EXPECT().SendPushNotification(ctx, gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return(nil)
+		Return(nil).AnyTimes()
 
 	service := &OrderServiceImpl{
 		orderDao:      mockOrderDao,
@@ -1837,4 +1837,91 @@ func TestStrictSanitization(t *testing.T) {
 			}
 		})
 	}
+}
+func TestOrderServiceImpl_pushShippingMessage_PushClientNotInitialized(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockOrderDao := daoMocks.NewMockOrderDao(ctrl)
+	mockOrderProductDao := daoMocks.NewMockOrderProductDao(ctrl)
+	mockKafkaWriter := utilMocks.NewMockWriter(ctrl)
+
+	service := &OrderServiceImpl{
+		orderDao:        mockOrderDao,
+		orderProductDao: mockOrderProductDao,
+		messageWriter:   mockKafkaWriter,
+		pushClient:      nil, // Push client not initialized
+	}
+
+	orderInfo := &model.Order{
+		OrderNo: "order123",
+		UserID:  123,
+	}
+
+	// Call the method
+	service.pushShippingMessage(context.TODO(), orderInfo, "shipping_no_123")
+
+	// Expect no errors and just log a warning
+}
+
+func TestOrderServiceImpl_pushShippingMessage_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockOrderDao := daoMocks.NewMockOrderDao(ctrl)
+	mockOrderProductDao := daoMocks.NewMockOrderProductDao(ctrl)
+	mockKafkaWriter := utilMocks.NewMockWriter(ctrl)
+	mockPushClient := mocks.NewMockIPushClient(ctrl)
+
+	service := &OrderServiceImpl{
+		orderDao:        mockOrderDao,
+		orderProductDao: mockOrderProductDao,
+		messageWriter:   mockKafkaWriter,
+		pushClient:      mockPushClient, // Push client initialized
+	}
+
+	orderInfo := &model.Order{
+		OrderNo: "order123",
+		UserID:  123,
+	}
+
+	// Set up expectations for push notification
+	mockPushClient.EXPECT().
+		SendPushNotification(gomock.Any(), orderInfo.UserID, "Your CeramiCraft order is on its way!", "Great news! Your handcrafted pieces have been shipped. Tap to track your package.", gomock.Any()).
+		Return(nil).
+		Times(1)
+
+	// Call the method
+	service.pushShippingMessage(context.TODO(), orderInfo, "shipping_no_123")
+}
+
+func TestOrderServiceImpl_pushShippingMessage_PushNotificationError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockOrderDao := daoMocks.NewMockOrderDao(ctrl)
+	mockOrderProductDao := daoMocks.NewMockOrderProductDao(ctrl)
+	mockKafkaWriter := utilMocks.NewMockWriter(ctrl)
+	mockPushClient := mocks.NewMockIPushClient(ctrl)
+
+	service := &OrderServiceImpl{
+		orderDao:        mockOrderDao,
+		orderProductDao: mockOrderProductDao,
+		messageWriter:   mockKafkaWriter,
+		pushClient:      mockPushClient, // Push client initialized
+	}
+
+	orderInfo := &model.Order{
+		OrderNo: "order123",
+		UserID:  123,
+	}
+
+	// Set up expectations for push notification with an error
+	mockPushClient.EXPECT().
+		SendPushNotification(gomock.Any(), orderInfo.UserID, "Your CeramiCraft order is on its way!", "Great news! Your handcrafted pieces have been shipped. Tap to track your package.", gomock.Any()).
+		Return(errors.New("push notification error")).
+		Times(1)
+
+	// Call the method
+	service.pushShippingMessage(context.TODO(), orderInfo, "shipping_no_123")
 }

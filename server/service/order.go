@@ -517,7 +517,7 @@ func (o *OrderServiceImpl) UpdateOrderStatus(ctx context.Context, orderNo string
 		if err != nil {
 			return err
 		}
-		o.pushShippingMessage(ctx, orderInfo, shippingNo)
+		go o.pushShippingMessage(ctx, orderInfo, shippingNo)
 	default:
 		defaultErr := fmt.Errorf("UpdateOrderStatus: status no support, cur status %d", newStatus)
 		return defaultErr
