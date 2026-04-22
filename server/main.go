@@ -18,6 +18,7 @@ import (
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/pkg/utils"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/repository"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/service"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/telemetry"
 	userUtils "github.com/sw5005-sus/ceramicraft-user-mservice/common/utils"
 )
 
@@ -38,6 +39,10 @@ func main() {
 	utils.InitKafka()
 	clients.InitAllClients(config.Config)
 	metrics.RegisterMetrics()
+	shutdownTrace := telemetry.InitTracer()
+	defer shutdownTrace()
+	shutdownMetrics := telemetry.InitMetrics()
+	defer shutdownMetrics()
 	go grpc.Init(sigCh)
 	go http.Init(sigCh)
 	go utils.GetReader().ConsumeMessage(context.Background())

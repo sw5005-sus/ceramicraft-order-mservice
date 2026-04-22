@@ -25,7 +25,7 @@ import (
 func CreateOrder(ctx *gin.Context) {
 	var req types.OrderInfo
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Logger.Errorf("CreateOrder: invalid request body: %v", err)
+		log.WithContext(ctx.Request.Context()).Errorf("CreateOrder: invalid request body: %v", err)
 		ctx.JSON(http.StatusBadRequest, RespError(ctx, err))
 		return
 	}
@@ -53,7 +53,7 @@ func CreateOrder(ctx *gin.Context) {
 func ListOrders(ctx *gin.Context) {
 	var req types.ListOrderRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Logger.Errorf("CreateOrder: invalid request body: %v", err)
+		log.WithContext(ctx.Request.Context()).Errorf("CreateOrder: invalid request body: %v", err)
 		ctx.JSON(http.StatusBadRequest, RespError(ctx, err))
 		return
 	}
@@ -68,7 +68,7 @@ func ListOrders(ctx *gin.Context) {
 
 	resp, err := service.GetOrderServiceInstance().ListOrders(ctx, req)
 	if err != nil {
-		log.Logger.Errorf("CreateOrder: invalid request body: %v", err)
+		log.WithContext(ctx.Request.Context()).Errorf("CreateOrder: invalid request body: %v", err)
 		ctx.JSON(http.StatusInternalServerError, RespError(ctx, err))
 		return
 	}
@@ -97,7 +97,7 @@ func GetOrderDetail(ctx *gin.Context) {
 
 	detail, err := service.GetOrderServiceInstance().GetOrderDetail(ctx, orderNo, true)
 	if err != nil {
-		log.Logger.Errorf("CreateOrder: invalid request body: %v", err)
+		log.WithContext(ctx.Request.Context()).Errorf("CreateOrder: invalid request body: %v", err)
 		ctx.JSON(http.StatusInternalServerError, RespError(ctx, err))
 		return
 	}
@@ -129,7 +129,7 @@ func GetOrderReceiverInfo(ctx *gin.Context) {
 			ctx.JSON(http.StatusNotFound, RespError(ctx, err))
 			return
 		}
-		log.Logger.Errorf("CreateOrder: invalid request body: %v", err)
+		log.WithContext(ctx.Request.Context()).Errorf("CreateOrder: invalid request body: %v", err)
 		ctx.JSON(http.StatusInternalServerError, RespError(ctx, err))
 		return
 	}
@@ -171,7 +171,7 @@ func CustomerListOrders(ctx *gin.Context) {
 		Offset:    req.Offset,
 	})
 	if err != nil {
-		log.Logger.Errorf("CreateOrder: invalid request body: %v", err)
+		log.WithContext(ctx.Request.Context()).Errorf("CreateOrder: invalid request body: %v", err)
 		ctx.JSON(http.StatusInternalServerError, RespError(ctx, err))
 		return
 	}
@@ -201,7 +201,7 @@ func CustomerGetOrderDetail(ctx *gin.Context) {
 	userID := ctx.Value("userID").(int)
 	detail, err := service.GetOrderServiceInstance().CustomerGetOrderDetail(ctx, orderNo, userID)
 	if err != nil {
-		log.Logger.Errorf("CreateOrder: invalid request body: %v", err)
+		log.WithContext(ctx.Request.Context()).Errorf("CreateOrder: invalid request body: %v", err)
 		ctx.JSON(http.StatusInternalServerError, RespError(ctx, err))
 		return
 	}
@@ -229,7 +229,7 @@ func ShipOrder(ctx *gin.Context) {
 
 	var req types.ShipOrderRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Logger.Errorf("CreateOrder: invalid request body: %v", err)
+		log.WithContext(ctx.Request.Context()).Errorf("CreateOrder: invalid request body: %v", err)
 		ctx.JSON(http.StatusBadRequest, RespError(ctx, err))
 		return
 	}
@@ -242,7 +242,7 @@ func ShipOrder(ctx *gin.Context) {
 	// 调用 service 层更新订单状态为已发货
 	err := service.GetOrderServiceInstance().UpdateOrderStatus(ctx, orderNo, consts.SHIPPED, req.TrackingNo) // 3 表示 SHIPPED
 	if err != nil {
-		log.Logger.Errorf("CreateOrder: invalid request body: %v", err)
+		log.WithContext(ctx.Request.Context()).Errorf("CreateOrder: invalid request body: %v", err)
 		ctx.JSON(http.StatusInternalServerError, RespError(ctx, err))
 		return
 	}
@@ -271,7 +271,7 @@ func ConfirmOrder(ctx *gin.Context) {
 	// 调用 service 层更新订单状态为已收货
 	err := service.GetOrderServiceInstance().UpdateOrderStatus(ctx, orderNo, consts.DELIVERED, "")
 	if err != nil {
-		log.Logger.Errorf("CreateOrder: invalid request body: %v", err)
+		log.WithContext(ctx.Request.Context()).Errorf("CreateOrder: invalid request body: %v", err)
 		ctx.JSON(http.StatusInternalServerError, RespError(ctx, err))
 		return
 	}
@@ -291,7 +291,7 @@ func ConfirmOrder(ctx *gin.Context) {
 func GetOrderStats(ctx *gin.Context) {
 	stats, err := service.GetOrderServiceInstance().GetOrderStats(ctx)
 	if err != nil {
-		log.Logger.Errorf("CreateOrder: invalid request body: %v", err)
+		log.WithContext(ctx.Request.Context()).Errorf("CreateOrder: invalid request body: %v", err)
 		ctx.JSON(http.StatusInternalServerError, RespError(ctx, err))
 		return
 	}

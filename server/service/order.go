@@ -68,27 +68,27 @@ const (
 )
 
 func (o *OrderServiceImpl) OrderAutoConfirm(ctx context.Context) {
-	log.Logger.Infof("Auto Confirm Order at: %v", time.Now())
+	log.WithContext(ctx).Infof("Auto Confirm Order at: %v", time.Now())
 	// 1. lock
 	lock := o.distributedLocker
 
 	err := lock.Lock(ctx)
 	if err != nil {
 		// 获取锁失败（其他实例正在处理），直接返回，等下一轮
-		log.Logger.Info("OrderAutoConfirm: failed to acquire lock, skipping this round")
+		log.WithContext(ctx).Info("OrderAutoConfirm: failed to acquire lock, skipping this round")
 		return
 	}
 
 	defer func() {
 		if unlockErr := lock.Unlock(ctx); unlockErr != nil {
-			log.Logger.Errorf("OrderAutoConfirm: failed to release lock, err: %s", unlockErr.Error())
+			log.WithContext(ctx).Errorf("OrderAutoConfirm: failed to release lock, err: %s", unlockErr.Error())
 		}
 	}()
 
 	// 2. update by status and shipped time
 	list, err := o.orderDao.AutoConfirmShippedOrders(ctx, consts.SHIPPED, consts.DELIVERED, AUTO_CONFIRM_AFTER_DAYS)
 	if err != nil {
-		log.Logger.Info("OrderAutoConfirm: failed to update order status, err: %s", err.Error())
+		log.WithContext(ctx).Info("OrderAutoConfirm: failed to update order status, err: %s", err.Error())
 		return
 	}
 
@@ -97,12 +97,12 @@ func (o *OrderServiceImpl) OrderAutoConfirm(ctx context.Context) {
 		statusChangeRemark := "Shipped --> AutoConfirmed"
 		oscMsg, err := getOrderStatusChangedMsg(order.OrderNo, order.UserID, statusChangeRemark, consts.DELIVERED)
 		if err != nil {
-			log.Logger.Errorf("get order status changed msg failed, err %s", err.Error())
+			log.WithContext(ctx).Errorf("get order status changed msg failed, err %s", err.Error())
 			continue
 		}
 		err = o.messageWriter.SendMsg(ctx, "order_status_changed", order.OrderNo, oscMsg)
 		if err != nil {
-			log.Logger.Errorf("send message failed, err %s", err)
+			log.WithContext(ctx).Errorf("send message failed, err %s", err)
 		}
 	}
 }
@@ -116,14 +116,14 @@ func (o *OrderServiceImpl) CreateOrder(ctx context.Context, orderInfo types.Orde
 		orderItemIds[idx] = int64(item.ProductID)
 	}
 
-	// log.Logger.Infof("CreateOrder: orderItemIds = %v", orderItemIds)
+	// log.WithContext(ctx).Infof("CreateOrder: orderItemIds = %v", orderItemIds)
 
 	// 1. rpc: call product service and check if all the related product's stock is enough
 	productList, err := o.productServiceClient.GetProductList(ctx, &productpb.GetProductListRequest{
 		Ids: orderItemIds,
 	})
 	if err != nil {
-		log.Logger.Errorf("CreateOrder: get product list failed, err: %s", err.Error())
+		log.WithContext(ctx).Errorf("CreateOrder: get product list failed, err: %s", err.Error())
 		return "", err
 	}
 
@@ -136,7 +136,7 @@ func (o *OrderServiceImpl) CreateOrder(ctx context.Context, orderInfo types.Orde
 	for _, orderItem := range orderInfo.OrderItemList {
 		if orderItem.Quantity > productId2StockMap[orderItem.ProductID] {
 			err = fmt.Errorf("CreateOrder failed, do not have enough stock, product id: %d", orderItem.ProductID)
-			log.Logger.Errorf(err.Error())
+			log.WithContext(ctx).Errorf(err.Error())
 			return "", err
 		}
 		itemTotalAmount += (orderItem.Price * orderItem.Quantity)
@@ -169,7 +169,7 @@ func (o *OrderServiceImpl) CreateOrder(ctx context.Context, orderInfo types.Orde
 		Tax:               tax,
 	})
 	if err != nil {
-		log.Logger.Errorf("CreateOrder: insert into db failed, err: %s", err.Error())
+		log.WithContext(ctx).Errorf("CreateOrder: insert into db failed, err: %s", err.Error())
 		return "", err
 	}
 
@@ -193,29 +193,29 @@ func (o *OrderServiceImpl) CreateOrder(ctx context.Context, orderInfo types.Orde
 	// save batch
 	_, err = o.orderProductDao.CreateBatch(ctx, orderProductModelList)
 	if err != nil {
-		log.Logger.Errorf("orderProductDao.CreateBatch: add order items failed, err %s", err.Error())
+		log.WithContext(ctx).Errorf("orderProductDao.CreateBatch: add order items failed, err %s", err.Error())
 		return "", err
 	}
 
 	orderMsg, err := getOrderMsg(orderId, orderInfo, userID)
 	if err != nil {
-		log.Logger.Errorf("getOrderMsg: json encode failed, err %s", err.Error())
+		log.WithContext(ctx).Errorf("getOrderMsg: json encode failed, err %s", err.Error())
 		return "", err
 	}
 	// 4. message queue: send msg -- order ID
 	err = o.messageWriter.SendMsg(ctx, "order_created", orderId, orderMsg)
 	if err != nil {
-		log.Logger.Errorf("CreateOrder: send message failed, err %s", err.Error())
+		log.WithContext(ctx).Errorf("CreateOrder: send message failed, err %s", err.Error())
 		return "", err
 	}
 
 	oscMsg, err := getOrderStatusChangedMsg(orderId, userID, "Created", 1)
 	if err != nil {
-		log.Logger.Errorf("get order status changed msg failed, err %s", err.Error())
+		log.WithContext(ctx).Errorf("get order status changed msg failed, err %s", err.Error())
 	}
 	err = o.messageWriter.SendMsg(ctx, "order_status_changed", orderId, oscMsg)
 	if err != nil {
-		log.Logger.Errorf("send message failed, err %s", err)
+		log.WithContext(ctx).Errorf("send message failed, err %s", err)
 	}
 
 	// 5. rpc: call product service and decrease stock
@@ -238,12 +238,12 @@ func (o *OrderServiceImpl) CreateOrder(ctx context.Context, orderInfo types.Orde
 	if err != nil || payResp.Code != 0 {
 		_ = o.messageWriter.SendMsg(ctx, "order_canceled", orderId, orderMsg)
 		if err != nil {
-			log.Logger.Errorf("CreateOrder: payment failed, err: %s", err.Error())
+			log.WithContext(ctx).Errorf("CreateOrder: payment failed, err: %s", err.Error())
 			return "", err
 		} else {
 			errMsg := payResp.ErrorMsg
 			rpcErr := errors.New(*errMsg)
-			log.Logger.Errorf("CreateOrder: payment failed, err: %s", rpcErr.Error())
+			log.WithContext(ctx).Errorf("CreateOrder: payment failed, err: %s", rpcErr.Error())
 			return "", rpcErr
 		}
 	}
@@ -251,17 +251,17 @@ func (o *OrderServiceImpl) CreateOrder(ctx context.Context, orderInfo types.Orde
 	// 6.1 payment success: update order status
 	err = o.orderDao.UpdateStatusAndPayment(ctx, orderId, consts.PAYED, time.Now())
 	if err != nil {
-		log.Logger.Errorf("CreateOrder: update status failed, err %s", err.Error())
+		log.WithContext(ctx).Errorf("CreateOrder: update status failed, err %s", err.Error())
 		return "", err
 	}
 
 	oscMsg, err = getOrderStatusChangedMsg(orderId, userID, "Created --> Paid", 2)
 	if err != nil {
-		log.Logger.Errorf("get order status changed msg failed, err %s", err.Error())
+		log.WithContext(ctx).Errorf("get order status changed msg failed, err %s", err.Error())
 	}
 	err = o.messageWriter.SendMsg(ctx, "order_status_changed", orderId, oscMsg)
 	if err != nil {
-		log.Logger.Errorf("send message failed, err %s", err)
+		log.WithContext(ctx).Errorf("send message failed, err %s", err)
 	}
 
 	return orderId, nil
@@ -320,7 +320,7 @@ func (o *OrderServiceImpl) ListOrders(ctx context.Context, req types.ListOrderRe
 	// 调用 DAO 层查询订单列表
 	orders, err := o.orderDao.GetByOrderQuery(ctx, query)
 	if err != nil {
-		log.Logger.Errorf("ListOrders: query orders failed, err: %s", err.Error())
+		log.WithContext(ctx).Errorf("ListOrders: query orders failed, err: %s", err.Error())
 		return nil, err
 	}
 
@@ -351,7 +351,7 @@ func (o *OrderServiceImpl) ListOrders(ctx context.Context, req types.ListOrderRe
 func (o *OrderServiceImpl) GetOrderReceiveDetail(ctx context.Context, orderNo string) (detail *types.OrderDetail, err error) {
 	order, err := o.orderDao.GetByOrderNo(ctx, orderNo)
 	if err != nil {
-		log.Logger.Errorf("GetOrderShipDetail: get order failed, orderNo: %s, err: %s", orderNo, err.Error())
+		log.WithContext(ctx).Errorf("GetOrderShipDetail: get order failed, orderNo: %s, err: %s", orderNo, err.Error())
 		return nil, err
 	}
 
@@ -373,21 +373,21 @@ func (o *OrderServiceImpl) GetOrderDetail(ctx context.Context, orderNo string, m
 	// 1. 查询订单基本信息
 	order, err := o.orderDao.GetByOrderNo(ctx, orderNo)
 	if err != nil {
-		log.Logger.Errorf("GetOrderDetail: get order failed, orderNo: %s, err: %s", orderNo, err.Error())
+		log.WithContext(ctx).Errorf("GetOrderDetail: get order failed, orderNo: %s, err: %s", orderNo, err.Error())
 		return nil, err
 	}
 
 	// 2. 查询订单商品列表
 	orderProducts, err := o.orderProductDao.GetByOrderNo(ctx, orderNo)
 	if err != nil {
-		log.Logger.Errorf("GetOrderDetail: get order products failed, orderNo: %s, err: %s", orderNo, err.Error())
+		log.WithContext(ctx).Errorf("GetOrderDetail: get order products failed, orderNo: %s, err: %s", orderNo, err.Error())
 		return nil, err
 	}
 
 	// 3. 查询订单状态日志
 	orderLogs, err := o.orderLogDao.GetByOrderNo(ctx, orderNo)
 	if err != nil {
-		log.Logger.Errorf("GetOrderDetail: get order logs failed, orderNo: %s, err: %s", orderNo, err.Error())
+		log.WithContext(ctx).Errorf("GetOrderDetail: get order logs failed, orderNo: %s, err: %s", orderNo, err.Error())
 		return nil, err
 	}
 
@@ -480,12 +480,12 @@ func getOrderStatusName(status int) string {
 func (o *OrderServiceImpl) CustomerGetOrderDetail(ctx context.Context, orderNo string, userId int) (detail *types.OrderDetail, err error) {
 	orderInfo, err := o.GetOrderDetail(ctx, orderNo, false)
 	if err != nil {
-		log.Logger.Errorf("CustomerGetOrderDetail: get order detail failed, err %s", err.Error())
+		log.WithContext(ctx).Errorf("CustomerGetOrderDetail: get order detail failed, err %s", err.Error())
 		return nil, err
 	}
 	if orderInfo.UserID != userId {
 		wrongUserErr := errors.New("invalid user ID")
-		log.Logger.Errorf("CustomerGetOrderDetail: Invalid userID, err %s", wrongUserErr.Error())
+		log.WithContext(ctx).Errorf("CustomerGetOrderDetail: Invalid userID, err %s", wrongUserErr.Error())
 		return nil, wrongUserErr
 	}
 	return orderInfo, nil
@@ -526,11 +526,11 @@ func (o *OrderServiceImpl) UpdateOrderStatus(ctx context.Context, orderNo string
 	statusChangeRemark := fmt.Sprintf("%s --> %s", getOrderStatusName(oldStatus), getOrderStatusName(newStatus))
 	oscMsg, err := getOrderStatusChangedMsg(orderNo, orderInfo.UserID, statusChangeRemark, newStatus)
 	if err != nil {
-		log.Logger.Errorf("get order status changed msg failed, err %s", err.Error())
+		log.WithContext(ctx).Errorf("get order status changed msg failed, err %s", err.Error())
 	}
 	err = o.messageWriter.SendMsg(ctx, "order_status_changed", orderNo, oscMsg)
 	if err != nil {
-		log.Logger.Errorf("send message failed, err %s", err)
+		log.WithContext(ctx).Errorf("send message failed, err %s", err)
 	}
 
 	return nil
@@ -538,7 +538,7 @@ func (o *OrderServiceImpl) UpdateOrderStatus(ctx context.Context, orderNo string
 
 func (o *OrderServiceImpl) pushShippingMessage(ctx context.Context, orderInfo *model.Order, shippingNo string) {
 	if o.pushClient == nil {
-		log.Logger.Warnf("Push client is not initialized, skipping push notification for shipped order %s", orderInfo.OrderNo)
+		log.WithContext(ctx).Warnf("Push client is not initialized, skipping push notification for shipped order %s", orderInfo.OrderNo)
 		return
 	}
 	title := "Your CeramiCraft order is on its way!"
@@ -552,9 +552,9 @@ func (o *OrderServiceImpl) pushShippingMessage(ctx context.Context, orderInfo *m
 	}
 	err := o.pushClient.SendPushNotification(ctx, orderInfo.UserID, title, body, data)
 	if err != nil {
-		log.Logger.Errorf("Failed to send push notification for shipped order %s: %v", orderInfo.OrderNo, err)
+		log.WithContext(ctx).Errorf("Failed to send push notification for shipped order %s: %v", orderInfo.OrderNo, err)
 	} else {
-		log.Logger.Infof("Push notification sent for shipped order %s", orderInfo.OrderNo)
+		log.WithContext(ctx).Infof("Push notification sent for shipped order %s", orderInfo.OrderNo)
 	}
 }
 
@@ -568,6 +568,6 @@ var (
 
 func strictSanitization(input string) string {
 	ret := pStrict.Sanitize(input)
-	log.Logger.Infof("strictSanitization: input = %s, output = %s", input, ret)
+	log.WithContext(ctx).Infof("strictSanitization: input = %s, output = %s", input, ret)
 	return ret
 }

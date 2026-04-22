@@ -3,11 +3,14 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 
 	auditclient "github.com/sw5005-sus/ceramicraft-audit-client"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/config"
 	_ "github.com/sw5005-sus/ceramicraft-order-mservice/server/docs"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/http/api"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/http/data"
+	"github.com/sw5005-sus/ceramicraft-order-mservice/server/log"
 	"github.com/sw5005-sus/ceramicraft-order-mservice/server/metrics"
 	"github.com/sw5005-sus/ceramicraft-user-mservice/common/middleware"
 	swaggerFiles "github.com/swaggo/files"
@@ -21,7 +24,7 @@ const (
 func NewRouter() *gin.Engine {
 	r := gin.Default()
 	auditMiddleware := auditclient.AuditMiddleware(
-		"order-ms",
+		data.ServiceName,
 		config.Config.AuditClient.Host,
 		config.Config.AuditClient.Port)
 	basicGroup := r.Group(serviceURIPrefix)
@@ -41,7 +44,7 @@ func NewRouter() *gin.Engine {
 
 		merchantGroup := basicGroup.Group("/merchant")
 		{
-			merchantGroup.Use(middleware.AuthMiddleware())
+			merchantGroup.Use(otelgin.Middleware(data.ServiceName), log.TraceLoggerMiddleware(), middleware.AuthMiddleware())
 			merchantGroup.POST("/orders/list", api.ListOrders)
 			merchantGroup.GET("/orders/:order_no", api.GetOrderDetail)
 			merchantGroup.GET("/orders/:order_no/receive-info", middleware.RequireRoles("merchant_admin"), auditMiddleware, api.GetOrderReceiverInfo)
@@ -51,7 +54,7 @@ func NewRouter() *gin.Engine {
 
 		customerGroup := basicGroup.Group("/customer")
 		{
-			customerGroup.Use(middleware.AuthMiddleware())
+			customerGroup.Use(otelgin.Middleware(data.ServiceName), log.TraceLoggerMiddleware(), middleware.AuthMiddleware())
 			customerGroup.POST("/orders", api.CreateOrder) // create order
 			customerGroup.POST("/orders/list", api.CustomerListOrders)
 			customerGroup.GET("/orders/:order_no", api.CustomerGetOrderDetail) // get order detail
