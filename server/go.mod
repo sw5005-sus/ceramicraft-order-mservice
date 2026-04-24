@@ -1,6 +1,6 @@
 module github.com/sw5005-sus/ceramicraft-order-mservice/server
 
-go 1.25.8
+go 1.25.9
 
 require (
 	github.com/gin-gonic/gin v1.12.0
@@ -11,14 +11,14 @@ require (
 	github.com/redis/go-redis/v9 v9.16.0
 	github.com/segmentio/kafka-go v0.4.49
 	github.com/spf13/viper v1.21.0
-	github.com/sw5005-sus/ceramicraft-audit-client v0.0.1
+	github.com/sw5005-sus/ceramicraft-audit-client v0.0.3
 	github.com/sw5005-sus/ceramicraft-commodity-mservice/client v0.0.1
 	github.com/sw5005-sus/ceramicraft-commodity-mservice/common v0.0.2
 	github.com/sw5005-sus/ceramicraft-order-mservice/common v0.0.1
 	github.com/sw5005-sus/ceramicraft-payment-mservice/client v0.0.1
 	github.com/sw5005-sus/ceramicraft-payment-mservice/common v0.0.1
 	github.com/sw5005-sus/ceramicraft-secure v0.0.2
-	github.com/sw5005-sus/ceramicraft-user-mservice/common v0.0.14
+	github.com/sw5005-sus/ceramicraft-user-mservice/common v0.0.15
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6

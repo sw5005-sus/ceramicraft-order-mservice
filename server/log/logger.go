@@ -52,7 +52,6 @@ func TraceLoggerMiddleware() gin.HandlerFunc {
 
 		logger := Logger
 		if sc.IsValid() {
-			fmt.Println("span valid, will log with trace")
 			logger = Logger.With(
 				"trace_id", sc.TraceID().String(),
 				"span_id", sc.SpanID().String(),

@@ -88,7 +88,7 @@ func (o *OrderServiceImpl) OrderAutoConfirm(ctx context.Context) {
 	// 2. update by status and shipped time
 	list, err := o.orderDao.AutoConfirmShippedOrders(ctx, consts.SHIPPED, consts.DELIVERED, AUTO_CONFIRM_AFTER_DAYS)
 	if err != nil {
-		log.WithContext(ctx).Info("OrderAutoConfirm: failed to update order status, err: %s", err.Error())
+		log.WithContext(ctx).Infof("OrderAutoConfirm: failed to update order status, err: %s", err.Error())
 		return
 	}
 
@@ -102,7 +102,7 @@ func (o *OrderServiceImpl) OrderAutoConfirm(ctx context.Context) {
 		}
 		err = o.messageWriter.SendMsg(ctx, "order_status_changed", order.OrderNo, oscMsg)
 		if err != nil {
-			log.WithContext(ctx).Errorf("send message failed, err %s", err)
+			log.WithContext(ctx).Errorf("send message failed, err %v", err)
 		}
 	}
 }
@@ -568,6 +568,6 @@ var (
 
 func strictSanitization(input string) string {
 	ret := pStrict.Sanitize(input)
-	log.WithContext(ctx).Infof("strictSanitization: input = %s, output = %s", input, ret)
+	log.Logger.Infof("strictSanitization: input = %s, output = %s", input, ret)
 	return ret
 }
