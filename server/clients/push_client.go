@@ -52,9 +52,9 @@ func (p *pushClient) SendPushNotification(ctx context.Context, userID int, title
 	}
 	resp, err := p.notificationClient.SendUserPush(ctx, req)
 	if err != nil {
-		log.Logger.Errorf("Failed to send push notification: %v", err)
+		log.WithContext(ctx).Errorf("Failed to send push notification: %v", err)
 		return err
 	}
-	log.Logger.Infof("Push notification sent to user %d: %s", userID, resp)
+	log.WithContext(ctx).Infof("Push notification sent to user %d: %s", userID, resp)
 	return nil
 }

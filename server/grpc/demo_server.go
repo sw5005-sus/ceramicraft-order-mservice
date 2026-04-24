@@ -12,6 +12,6 @@ type DemoService struct {
 }
 
 func (s *DemoService) SayHello(ctx context.Context, in *demopb.HelloRequest) (*demopb.HelloResponse, error) {
-	log.Logger.Infof("Received: %v", in.GetName())
+	log.WithContext(ctx).Infof("Received: %v", in.GetName())
 	return &demopb.HelloResponse{Message: "Hello " + in.GetName()}, nil
 }

@@ -76,7 +76,7 @@ func (myWriter *MyWriter) SendMsg(ctx context.Context, topic, key, value string)
 			Value: []byte(value),
 		})
 		if err != nil {
-			log.Logger.Errorf("SendMsg: failed, err %s", err.Error())
+			log.WithContext(ctx).Errorf("SendMsg: failed, err %s", err.Error())
 		}
 	}()
 	return nil
@@ -119,14 +119,14 @@ func (mc *MyConsumer) ConsumeMessage(ctx context.Context) {
 	for {
 		msgRaw, err := mc.r.ReadMessage(ctx)
 		if err != nil {
-			log.Logger.Errorf("read message failed, err = %s", err.Error())
+			log.WithContext(ctx).Errorf("read message failed, err = %s", err.Error())
 			break
 		}
-		log.Logger.Infof("get message: %s", string(msgRaw.Value))
+		log.WithContext(ctx).Infof("get message: %s", string(msgRaw.Value))
 		var msg types.OrderStatusChangedMessage
 		err = JSONDecode(string(msgRaw.Value), &msg)
 		if err != nil {
-			log.Logger.Errorf("parse json failed, err = %s", err.Error())
+			log.WithContext(ctx).Errorf("parse json failed, err = %s", err.Error())
 			continue
 		}
 		_, err = mc.orderLogDao.Create(ctx, &model.OrderStatusLog{
@@ -137,7 +137,7 @@ func (mc *MyConsumer) ConsumeMessage(ctx context.Context) {
 			CreateTime:    time.Now(),
 		})
 		if err != nil {
-			log.Logger.Errorf("create order log failed, err = %s", err.Error())
+			log.WithContext(ctx).Errorf("create order log failed, err = %s", err.Error())
 			break
 		}
 	}

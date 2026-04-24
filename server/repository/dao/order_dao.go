@@ -129,7 +129,7 @@ func (d *OrderDaoImpl) GetByOrderQuery(ctx context.Context, query OrderQuery) (o
 	for _, o := range oList {
 		err = o.Decrypt()
 		if err != nil {
-			log.Logger.Errorf("Failed to decrypt order data for orderNo %s: %v", o.OrderNo, err)
+			log.WithContext(ctx).Errorf("Failed to decrypt order data for orderNo %s: %v", o.OrderNo, err)
 			return []*model.Order{}, err
 		}
 	}

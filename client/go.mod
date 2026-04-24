@@ -1,6 +1,6 @@
 module github.com/sw5005-sus/ceramicraft-order-mservice/client
 
-go 1.25.8
+go 1.25.9
 
 require (
 	github.com/sw5005-sus/ceramicraft-order-mservice/common v0.0.1

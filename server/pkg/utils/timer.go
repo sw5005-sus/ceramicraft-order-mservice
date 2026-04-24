@@ -32,19 +32,19 @@ func (t *MyTimerImpl) Start(ctx context.Context, task func()) {
 	ticker := time.NewTicker(t.interval)
 	defer ticker.Stop()
 
-	log.Logger.Infof("Ticker started with interval: %v", t.interval)
+	log.WithContext(ctx).Infof("Ticker started with interval: %v", t.interval)
 
 	for {
 		select {
 		case <-ticker.C:
 			// Execute task on each tick
-			log.Logger.Infof("Task run at %v", time.Now())
+			log.WithContext(ctx).Infof("Task run at %v", time.Now())
 			task()
 		case <-t.stopChan:
-			log.Logger.Info("Ticker stopped")
+			log.WithContext(ctx).Info("Ticker stopped")
 			return
 		case <-ctx.Done():
-			log.Logger.Info("Ticker stopped due to context cancellation")
+			log.WithContext(ctx).Info("Ticker stopped due to context cancellation")
 			return
 		}
 	}
