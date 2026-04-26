@@ -35,6 +35,7 @@ type OrderMessage struct {
 	ReceiverZipCode   int              `json:"receiver_zip_code"`   // 收货人邮政编码
 	Remark            string           `json:"remark"`              // 备注
 	OrderItemList     []*OrderItemInfo `json:"order_item_list"`
+	TotalAmount        int              `json:"total_amount"` // 订单总价
 }
 
 type OrderStatusChangedMessage struct {

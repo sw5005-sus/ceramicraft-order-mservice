@@ -151,7 +151,7 @@ func (o *OrderServiceImpl) CreateOrder(ctx context.Context, orderInfo types.Orde
 	// 3. save order Info to database
 	// 3.1 save order Info
 	currentTime := time.Now()
-	_, err = o.orderDao.Create(ctx, &model.Order{
+	orderModel := &model.Order{
 		OrderNo:           orderId,
 		UserID:            userID,
 		Status:            consts.CREATED,
@@ -167,7 +167,8 @@ func (o *OrderServiceImpl) CreateOrder(ctx context.Context, orderInfo types.Orde
 		Remark:            strictSanitization(orderInfo.Remark),
 		ShippingFee:       shippingFee,
 		Tax:               tax,
-	})
+	}
+	_, err = o.orderDao.Create(ctx, orderModel)
 	if err != nil {
 		log.WithContext(ctx).Errorf("CreateOrder: insert into db failed, err: %s", err.Error())
 		return "", err
@@ -197,7 +198,7 @@ func (o *OrderServiceImpl) CreateOrder(ctx context.Context, orderInfo types.Orde
 		return "", err
 	}
 
-	orderMsg, err := getOrderMsg(orderId, orderInfo, userID)
+	orderMsg, err := getOrderMsg(orderId, orderInfo, userID, orderModel.TotalAmount)
 	if err != nil {
 		log.WithContext(ctx).Errorf("getOrderMsg: json encode failed, err %s", err.Error())
 		return "", err
@@ -267,7 +268,7 @@ func (o *OrderServiceImpl) CreateOrder(ctx context.Context, orderInfo types.Orde
 	return orderId, nil
 }
 
-func getOrderMsg(orderId string, orderInfo types.OrderInfo, userId int) (msg string, err error) {
+func getOrderMsg(orderId string, orderInfo types.OrderInfo, userId, totalAmount int) (msg string, err error) {
 	orderMessage := types.OrderMessage{
 		UserID:            userId,
 		OrderID:           orderId,
@@ -276,6 +277,7 @@ func getOrderMsg(orderId string, orderInfo types.OrderInfo, userId int) (msg str
 		ReceiverCountry:   orderInfo.ReceiverCountry,
 		Remark:            orderInfo.Remark,
 		OrderItemList:     orderInfo.OrderItemList,
+		TotalAmount:       totalAmount,
 	}
 	orderMsgJson, err := utils.JSONEncode(orderMessage)
 	return orderMsgJson, err
